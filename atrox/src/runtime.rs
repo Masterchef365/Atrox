@@ -1,12 +1,18 @@
-use std::{marker::PhantomData, collections::HashMap};
+use std::{collections::HashMap, marker::PhantomData};
 
-use serde::{Serialize, Deserialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-struct Runtime {
+pub struct Runtime {
     own_bytecode: &'static [u8],
     wasm: wasmtime::Engine,
     own_module: wasmtime::Module,
-    own_fns: HashMap<String, >
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DynFn<Input, Output> {
+    source: Vec<u8>,
+    symbol: String,
+    _phantomdata: PhantomData<(Input, Output)>,
 }
 
 impl Runtime {
@@ -16,7 +22,6 @@ impl Runtime {
     pub fn new(own_bytecode: &'static [u8]) -> Self {
         let wasm = wasmtime::Engine::new(&Default::default()).unwrap();
         let own_module = wasmtime::Module::new(&wasm, own_bytecode).unwrap();
-        for  own_module.exports()
 
         Self {
             wasm,
@@ -26,6 +31,7 @@ impl Runtime {
         }
     }
 
+    /// Find the corresponding function in our own WASM bytecode
     pub fn new_fn<Input, Output, F: Fn(Input) -> Output>(&self, f: F) -> DynFn<Input, Output> {
         // Bad name bodge lol
         let name = std::any::type_name::<F>();
@@ -34,23 +40,31 @@ impl Runtime {
         let name = name.split("::").last().unwrap();
         let symbol = format!("__atrox_{}", name);
 
+        // Check that this is part of our own source
+        assert!(
+            self.own_module
+                .exports()
+                .any(|export| export.name() == symbol && export.ty().func().is_some()),
+            "Symbol {} not found in WASM binary. Did you build it yet?",
+            symbol
+        );
+
         // Get the equivalent symbol
-        DynFn { _phantondata: Default::default(), symbol, source: self.own_bytecode.to_vec()  }
+        DynFn {
+            symbol,
+            source: self.own_bytecode.to_vec(),
+            _phantomdata: Default::default(),
+        }
     }
 
-    pub fn exec<Input, Output>(&self, f: &DynFn<Input, Output>, input: &Input) -> Result<Output> {
-        let input_bytes = bincode::serialize(&input) ;
-
-
+    pub fn call<Input: Serialize, Output: DeserializeOwned>(
+        &self,
+        f: &DynFn<Input, Output>,
+        input: &Input,
+    ) -> Output {
+        let input_bytes = bincode::serialize(&input);
+        todo!()
     }
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct DynFn<Input, Output> {
-    source: Vec<u8>,
-    symbol: String,
-    _phantondata: PhantomData<(Input, Output)>,
-}
-
-impl<Input, Output> DynFn<Input, Output> {
-}
+//impl<Input, Output> DynFn<Input, Output> {}
