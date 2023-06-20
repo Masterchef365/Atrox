@@ -1,3 +1,4 @@
-pushd ./examples/basic/
 cargo build --target=wasm32-unknown-unknown\
-    && cargo run
+    && cargo run --bin basic\
+    && cargo run --bin loader -- out.fn
+    

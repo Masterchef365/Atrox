@@ -11,9 +11,12 @@ fn main() {
 
     let f = runtime.new_fn(attorney_general_foo_barr);
     dbg!(runtime.call(&f, &99));
+
+    let ser_fn = atrox::bincode::serialize(&f).unwrap();
+    std::fs::write("out.fn", &ser_fn).unwrap();
 }
 
 #[atrox::generate_function]
 fn attorney_general_foo_barr(a: i32) -> i32 {
-    a * 2
+    a * a
 }
