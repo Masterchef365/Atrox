@@ -14,23 +14,18 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
     // Generate the new function name by appending "_generated" to the original name
     let generated_fn_name = syn::Ident::new(&format!("{}_generated", fn_name), fn_name.span());
 
-    // Generate the function body
-    let generated_fn_body = quote! {
-        // Add your custom generated code here
-        // This is just an example that prints a message
-        println!("Generated function called!");
-
-        // Call the original function
-        #fn_name(5, 6)
-    };
-
     // Generate the new function item with the generated name and body
     let generated_fn_item = quote! {
         #[allow(non_snake_case)]
         #item_fn
 
         fn #generated_fn_name() -> i32 {
-            #generated_fn_body
+            // Add your custom generated code here
+            // This is just an example that prints a message
+            println!("Generated function called!");
+
+            // Call the original function
+            #fn_name(5, 6)
         }
     };
 
