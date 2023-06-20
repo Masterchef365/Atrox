@@ -15,14 +15,17 @@ fn attorney_general_foo_barr(a: i32) -> i32 {
 let f = runtime.new_fn(attorney_general_foo_barr);
 
 // And send it elsewhere!
-let ser_fn = atrox::bincode::serialize(&f).unwrap();
+let ser_fn = bincode::serialize(&f).unwrap();
+//let ser_fn = serde_json::to_vec(&f).unwrap();
+
 std::fs::write("out.fn", &ser_fn).unwrap();
 ```
 
 And then we can use it from any other Rust program (on any platform supported by wasmtime!)
 ```rust
-let t ser_fn = std::fs::read("out.fn").unwrap();
-let dyn_fn: DynFn<i32, i32> = atrox::bincode::deserialize(&ser_fn).unwrap();
+let ser_fn = std::fs::read("out.fn").unwrap();
+let dyn_fn: DynFn<i32, i32> = bincode::deserialize(&ser_fn).unwrap();
+//let dyn_fn: DynFn<i32, i32> = serde_json::from_slice(&ser_fn).unwrap();
 
 dbg!(runtime.call(&dyn_fn, &1337));
 ```
