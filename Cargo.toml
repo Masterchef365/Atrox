@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "atrox",
+    "atrox-derive",
+    "examples/basic",
+]
