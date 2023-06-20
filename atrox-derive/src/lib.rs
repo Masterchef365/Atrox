@@ -21,7 +21,7 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
         println!("Generated function called!");
 
         // Call the original function
-        #fn_name()
+        #fn_name(5, 6)
     };
 
     // Generate the new function item with the generated name and body
@@ -29,7 +29,7 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
         #[allow(non_snake_case)]
         #item_fn
 
-        fn #generated_fn_name() {
+        fn #generated_fn_name() -> i32 {
             #generated_fn_body
         }
     };

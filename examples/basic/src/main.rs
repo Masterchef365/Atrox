@@ -1,8 +1,8 @@
 fn main() {
-    let f: DynFn = DynFn::from(attorney_general_foo_barr);
+    dbg!(attorney_general_foo_barr_generated());
 }
 
-#[atrox]
-fn attorney_general_foo_barr() {
-
+#[atrox::generate_function]
+fn attorney_general_foo_barr(a: i32, b: i32) -> i32 {
+    a - b
 }
