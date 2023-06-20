@@ -1,4 +1,4 @@
-use std::{collections::HashMap, marker::PhantomData};
+use std::marker::PhantomData;
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use wasmtime::{Instance, Module, Store};
@@ -33,7 +33,7 @@ impl Runtime {
     }
 
     /// Find the corresponding function in our own WASM bytecode
-    pub fn new_fn<Input, Output, F: Fn(Input) -> Output>(&self, f: F) -> DynFn<Input, Output> {
+    pub fn new_fn<Input, Output, F: Fn(Input) -> Output>(&self, _f: F) -> DynFn<Input, Output> {
         // Bad name bodge lol
         let name = std::any::type_name::<F>();
 

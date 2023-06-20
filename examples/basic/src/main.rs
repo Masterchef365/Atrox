@@ -5,7 +5,9 @@ fn main() {}
 fn main() {
     use atrox::runtime::*;
 
-    let runtime = Runtime::new(include_bytes!("../../../target/wasm32-unknown-unknown/debug/basic.wasm"));
+    let runtime = Runtime::new(include_bytes!(
+        "../../../target/wasm32-unknown-unknown/debug/basic.wasm"
+    ));
 
     let f = runtime.new_fn(attorney_general_foo_barr);
     dbg!(runtime.call(&f, &99));
