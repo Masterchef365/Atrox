@@ -19,6 +19,7 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
         #[allow(non_snake_case)]
         #item_fn
 
+        #[no_mangle]
         fn #generated_fn_name() -> i32 {
             // Add your custom generated code here
             // This is just an example that prints a message
