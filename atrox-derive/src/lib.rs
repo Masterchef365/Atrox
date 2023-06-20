@@ -24,14 +24,22 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
             let mut mem = atrox::__RESERVED_MEMORY.lock().unwrap();
 
             if size == u32::MAX {
-                // Call function underneath
+                // Deserialize inputs
                 let input_val = atrox::bincode::deserialize(mem.as_slice())
                     .expect("Failed to decode function args");
 
+                // Call function underneath
                 let output_val = #fn_name(input_val);
 
-                *mem = atrox::bincode::serialize(&output_val)
+                // Serialize outputs
+                let output_bytes = atrox::bincode::serialize(&output_val)
                     .expect("Failed to encode function result");
+
+                // Write a header indicating the size of the returned value
+                *mem = (output_bytes.len() as u32).to_le_bytes().to_vec();
+
+                // Write outputs into memory
+                mem.extend_from_slice(&output_bytes);
             } else {
                 // Allocate and return without calling the wrapped function
                 *mem = vec![0; size as usize];
