@@ -12,7 +12,7 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
     let fn_name = &fn_signature.ident;
 
     // Generate the new function name by appending "_generated" to the original name
-    let generated_fn_name = syn::Ident::new(&format!("{}_generated", fn_name), fn_name.span());
+    let generated_fn_name = syn::Ident::new(&format!("__atrox_{}", fn_name), fn_name.span());
 
     // Generate the new function item with the generated name and body
     let generated_fn_item = quote! {
@@ -20,13 +20,24 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
         #item_fn
 
         #[no_mangle]
-        fn #generated_fn_name() -> i32 {
-            // Add your custom generated code here
-            // This is just an example that prints a message
-            println!("Generated function called!");
+        fn #generated_fn_name(size: u32) -> *mut u8 {
+            let mut mem = atrox::__RESERVED_MEMORY.lock().unwrap();
 
-            // Call the original function
-            #fn_name(5, 6)
+            if size == u32::MAX {
+                // Call function underneath
+                let input_val = atrox::bincode::deserialize(mem.as_slice())
+                    .expect("Failed to decode function args");
+
+                let output_val = #fn_name(input_val);
+
+                *mem = atrox::bincode::serialize(&output_val)
+                    .expect("Failed to encode function result");
+            } else {
+                // Allocate and return without calling the wrapped function
+                *mem = vec![0; size as usize];
+            }
+
+            mem.as_mut_ptr()
         }
     };
 
