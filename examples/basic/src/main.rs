@@ -1,5 +1,5 @@
 fn main() {
-    dbg!(__atrox_attorney_general_foo_barr(99));
+    dbg!(attorney_general_foo_barr(99));
 }
 
 #[atrox::generate_function]

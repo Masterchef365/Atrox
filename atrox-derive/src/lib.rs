@@ -16,9 +16,9 @@ pub fn generate_function(_: TokenStream, item: TokenStream) -> TokenStream {
 
     // Generate the new function item with the generated name and body
     let generated_fn_item = quote! {
-        #[allow(non_snake_case)]
         #item_fn
 
+        #[cfg(target_arch = "wasm32")]
         #[no_mangle]
         fn #generated_fn_name(size: u32) -> *mut u8 {
             let mut mem = atrox::__RESERVED_MEMORY.lock().unwrap();
